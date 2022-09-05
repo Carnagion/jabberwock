@@ -37,7 +37,7 @@ pub fn build() -> Result<()>
     build_with(&mut Config::default())
 }
 
-/// Builds a static website by transpiling input Hatter files to output files as specified by a [Config].
+/// Builds a static website by transpiling input Hatter files to output HTML files as specified by a [Config].
 ///
 /// # Errors
 ///
