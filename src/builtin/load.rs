@@ -12,8 +12,10 @@ use toml::Value as Toml;
 
 use crate::utils::macros;
 
+/// The environment variable that stores the path of the variables directory.
 pub const VARIABLES_DIR_VAR: &str = "variables";
 
+/// Loads variables defined in a specified `.toml` file into the current Hatter environment.
 pub fn load(args: Args) -> Result<Value>
 {
     let in_dir_val = macros::require_env_var!(crate::INPUT_DIR_VAR, args.env)?.to_owned();

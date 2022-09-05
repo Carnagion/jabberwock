@@ -1,3 +1,5 @@
+//! A collection of useful built-in Hatter functions.
+
 mod content;
 pub use content::*;
 

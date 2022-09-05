@@ -11,22 +11,26 @@ use crate::utils::macros;
 mod config;
 pub use config::*;
 
+/// The environment variable that stores the path of the input directory.
 pub const INPUT_DIR_VAR: &str = "input";
+
+/// The environment variable that stores the path of the output directory.
 pub const OUTPUT_DIR_VAR: &str = "output";
 
+/// Builds a static website by transpiling input `.hat` files to output `.html` files as specified by a [Config].
 pub fn build(config: &mut Config) -> Result<()>
 {
     // Empty output directory
-    fs::remove_dir_all(config.get_output_dir())?;
-    fs::create_dir_all(config.get_output_dir())?;
+    fs::remove_dir_all(&config.output_dir)?;
+    fs::create_dir_all(&config.output_dir)?;
 
     // Construct file rules
     let file_rules = build_file_rules(config)?;
 
     // Create new scope in env, build files, and reset scope when done
     config.env.push_scope();
-    config.env.set(INPUT_DIR_VAR, config.get_input_dir());
-    config.env.set(OUTPUT_DIR_VAR, config.get_output_dir());
+    config.env.set(INPUT_DIR_VAR, &config.input_dir);
+    config.env.set(OUTPUT_DIR_VAR, &config.output_dir);
     let build_result = build_all_files(config, &file_rules);
     config.env.pop_scope();
 
@@ -57,13 +61,13 @@ fn build_all_files(config: &mut Config, file_rules: &HashMap<PathBuf, FileRule>)
             FileRule::Ignore => continue,
             FileRule::Copy =>
             {
-                let out_path = out_path(in_path, config.get_input_dir(), config.get_output_dir())?;
+                let out_path = out_path(in_path, &config.input_dir, &config.output_dir)?;
                 fs::create_dir_all(out_path.parent().ok_or_else(|| macros::hatter_error!(RuntimeError, ""))?)?;
                 fs::copy(in_path, out_path)?;
             },
             FileRule::Transpile =>
             {
-                let out_path = out_path(in_path, config.get_input_dir(), config.get_output_dir())?;
+                let out_path = out_path(in_path, &config.input_dir, &config.output_dir)?;
                 let hat = fs::read_to_string(in_path)?;
                 let html = config.env.render(&hat)?;
                 fs::create_dir_all(out_path.parent().ok_or_else(|| macros::hatter_error!(RuntimeError, ""))?)?;
