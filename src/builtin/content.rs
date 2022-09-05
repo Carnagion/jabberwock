@@ -20,7 +20,7 @@ pub fn content(args: Args) -> Result<Value>
                 .join(markdown_dir_path.to_str())
                 .join(args.need_string(0)?)
                 .with_extension("md"))
-            .map_or_else(|error| Err(macros::hatter_error!(RuntimeError, format!("Could not parse markdown: {}", error))), |markdown| Ok(Value::String(markdown.into()))),
+            .map_or_else(|error| Err(macros::hatter_error!(RuntimeError, format!("Could not parse markdown: {error}"))), |markdown| Ok(Value::String(markdown.into()))),
         (in_dir_val, markdown_dir_val) => Err(macros::hatter_error!(RuntimeError, format!(r#"Expected strings in "{}" and "{}", got: {} and {}"#, crate::INPUT_DIR_VAR, MARKDOWN_DIR_VAR, in_dir_val.typename(), markdown_dir_val.typename()))),
     }
 }

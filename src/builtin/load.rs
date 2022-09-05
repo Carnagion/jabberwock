@@ -27,7 +27,7 @@ pub fn load(args: Args) -> Result<Value>
                     .join(args.need_string(0)?)
                     .with_extension("toml"))?
                 .parse::<Toml>()
-                .map_err(|error| macros::hatter_error!(RuntimeError, format!("Invalid TOML: {}", error)))?
+                .map_err(|error| macros::hatter_error!(RuntimeError, format!("Invalid TOML: {error}")))?
                 .as_table()
                 .ok_or_else(|| macros::hatter_error!(RuntimeError, "Invalid TOML"))?
                 .iter()
