@@ -87,10 +87,11 @@ impl Default for Config
 {
     /// The default configuration.
     ///
-    /// Consists of the following directories and rules:
-    /// - All files in the input directory (`in/`) will be copied to the output directory (`out/`)...
-    /// - ...except for `.hat` files, which will be transpiled to `.html` files...
-    /// - ..and files in the templates (`in/tmpl/`), variables (`in/vars/`), and markdown (`in/md/`) directories, which will be ignored (including Hatter files).
+    /// All files in the input directory (`in/`) will be copied to the output directory (`out/`), except for `.hat` files, which will be transpiled to `.html` files.
+    /// Additionally, enabling certain features also causes all files in the following directories to be ignored (including `.hat` files):
+    /// - `in/md/` (if the `markdown` feature is enabled)
+    /// - `in/tmpl/` (if the `templates` feature is enabled)
+    /// - `in/vars/` (if the `variables` feature is enabled)
     fn default() -> Self
     {
         let mut config =  Config

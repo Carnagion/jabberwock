@@ -1,4 +1,6 @@
 //! A collection of useful built-in Hatter functions.
+//!
+//! Only available if any of the `markdown`, `templates`, or `variables` features are enabled.
 
 #[cfg(feature = "markdown")]
 mod content;

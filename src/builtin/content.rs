@@ -9,9 +9,13 @@ use markdown;
 use crate::utils::macros;
 
 /// The environment variable that stores the path of the markdown directory.
+///
+/// Only available if the `markdown` feature is enabled.
 pub const MARKDOWN_DIR_VAR: &str = "markdown";
 
 /// Transpiles a specified `.md` file and includes its HTML output into the current `.hat` file.
+///
+/// Only available if the `markdown` feature is enabled.
 pub fn content(args: Args) -> Result<Value>
 {
     let in_dir_val = macros::require_env_var!(crate::INPUT_DIR_VAR, args.env)?.to_owned();
