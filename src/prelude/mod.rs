@@ -16,12 +16,20 @@ pub const OUTPUT_DIR_VAR: &str = "output";
 
 pub fn build(config: &mut Config) -> Result<()>
 {
+    // Empty output directory
+    fs::remove_dir_all(config.get_output_dir())?;
+    fs::create_dir_all(config.get_output_dir())?;
+
+    // Construct file rules
     let file_rules = build_file_rules(config)?;
+
+    // Create new scope in env, build files, and reset scope when done
     config.env.push_scope();
     config.env.set(INPUT_DIR_VAR, config.get_input_dir());
     config.env.set(OUTPUT_DIR_VAR, config.get_output_dir());
     let build_result = build_all_files(config, &file_rules);
     config.env.pop_scope();
+
     build_result
 }
 
