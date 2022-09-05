@@ -11,3 +11,5 @@ mod prelude;
 pub use prelude::*;
 
 mod utils;
+
+pub use glob::Pattern;
