@@ -100,7 +100,7 @@ fn build_all_files(config: &mut Config, file_rules: &HashMap<PathBuf, FileRule>)
             FileRule::Copy =>
             {
                 let out_path = out_path(in_path, &config.input_dir, &config.output_dir)?;
-                fs::create_dir_all(out_path.parent().ok_or_else(|| macros::hatter_error!(RuntimeError, ""))?)?;
+                fs::create_dir_all(out_path.parent().ok_or_else(|| macros::hatter_error!(RuntimeError, format!("Error creating directory: {}", in_path.display())))?)?;
                 fs::copy(in_path, out_path)?;
             },
             FileRule::Transpile =>
@@ -108,7 +108,7 @@ fn build_all_files(config: &mut Config, file_rules: &HashMap<PathBuf, FileRule>)
                 let out_path = out_path(in_path, &config.input_dir, &config.output_dir)?;
                 let hat = fs::read_to_string(in_path)?;
                 let html = config.env.render(&hat)?;
-                fs::create_dir_all(out_path.parent().ok_or_else(|| macros::hatter_error!(RuntimeError, ""))?)?;
+                fs::create_dir_all(out_path.parent().ok_or_else(|| macros::hatter_error!(RuntimeError, format!("Error creating directory: {}", in_path.display())))?)?;
                 fs::write(out_path.with_extension("html"), html)?;
             }
         }

@@ -1,7 +1,3 @@
-use std::path::Path;
-
-use glob::Pattern;
-
 use hatter::Env;
 
 #[cfg(any(feature = "markdown", feature = "templates", feature = "variables"))]
@@ -33,7 +29,7 @@ pub struct Config
     /// The path to the output directory.
     pub output_dir: String,
 
-    file_rules: Vec<(Pattern, FileRule)>,
+    file_rules: Vec<(String, FileRule)>,
 }
 
 impl Config
@@ -60,24 +56,13 @@ impl Config
     }
 
     /// Returns all file rules specified in a configuration.
-    pub fn file_rules(&self) -> &Vec<(Pattern, FileRule)>
+    pub fn file_rules(&self) -> &Vec<(String, FileRule)>
     {
         &self.file_rules
     }
 
-    /// Finds the latest specified file rule for a path, or the default if the path was not matched by any patterns.
-    pub fn get_file_rule(&self, path: impl AsRef<Path>) -> FileRule
-    {
-        *self.file_rules
-            .iter()
-            .rev()
-            .find(|(pattern, _)| pattern.matches_path(path.as_ref()))
-            .map(|(_, rule)| rule)
-            .unwrap_or(&FileRule::default())
-    }
-
     /// Sets a rule for all files matched by a pattern, overriding any previously defined rules for them.
-    pub fn set_file_rule(&mut self, pattern: impl Into<Pattern>, rule: FileRule)
+    pub fn set_file_rule(&mut self, pattern: impl Into<String>, rule: FileRule)
     {
         self.file_rules.push((pattern.into(), rule));
     }
@@ -103,30 +88,30 @@ impl Default for Config
         };
 
         // Copy all files in the input directory
-        config.set_file_rule(Pattern::new("in/**/*").unwrap_or_default(), FileRule::Copy);
+        config.set_file_rule("in/**/*", FileRule::Copy);
 
         // Transpile all .hat files in the input directory
-        config.set_file_rule(Pattern::new("in/**/*.hat").unwrap(), FileRule::Transpile);
+        config.set_file_rule("in/**/*.hat", FileRule::Transpile);
 
         #[cfg(feature = "markdown")]
         {
             config.env.set(builtin::MARKDOWN_DIR_VAR, "md");
             config.env.set("content", builtin::content);
-            config.set_file_rule(Pattern::new("in/md/*").unwrap(), FileRule::Ignore);
+            config.set_file_rule("in/md/*", FileRule::Ignore);
         }
 
         #[cfg(feature = "templates")]
         {
             config.env.set(builtin::TEMPLATES_DIR_VAR, "tmpl");
             config.env.set("include", builtin::include);
-            config.set_file_rule(Pattern::new("in/tmpl/*").unwrap(), FileRule::Ignore);
+            config.set_file_rule("in/tmpl/*", FileRule::Ignore);
         }
 
         #[cfg(feature = "variables")]
         {
             config.env.set(builtin::VARIABLES_DIR_VAR, "vars");
             config.env.set("load", builtin::load);
-            config.set_file_rule(Pattern::new("in/vars/*").unwrap(), FileRule::Ignore);
+            config.set_file_rule("in/vars/*", FileRule::Ignore);
         }
 
         config
