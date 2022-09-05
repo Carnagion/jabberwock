@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::fs;
+use std::path::Path;
 use std::path::PathBuf;
 
 use glob;
@@ -77,10 +78,13 @@ pub fn build_with(config: &mut Config) -> Result<()>
 
 fn build_file_rules(config: &mut Config) -> Result<HashMap<PathBuf, FileRule>>
 {
+    let in_dir_path = Path::new(&config.input_dir);
     let mut file_rules = HashMap::new();
     for (pattern, rule) in config.file_rules()
     {
-        let paths = glob::glob(pattern.as_str())
+        let paths = glob::glob(in_dir_path.join(pattern)
+                .to_str()
+                .ok_or_else(|| macros::hatter_error!(RuntimeError, format!("Path or pattern contains invalid UTF-8 characters: {}, {}", in_dir_path.display(), pattern)))?)
             .map_err(|error| macros::hatter_error!(RuntimeError, format!("{error}")))?;
         for result in paths
         {

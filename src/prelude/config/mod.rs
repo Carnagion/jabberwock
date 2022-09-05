@@ -73,10 +73,10 @@ impl Default for Config
     /// The default configuration.
     ///
     /// All files in the input directory (`in/`) will be copied to the output directory (`out/`), except for `.hat` files, which will be transpiled to `.html` files.
-    /// Additionally, enabling certain features also causes all files in the following directories to be ignored (including `.hat` files):
-    /// - `in/md/` (if the `markdown` feature is enabled)
-    /// - `in/tmpl/` (if the `templates` feature is enabled)
-    /// - `in/vars/` (if the `variables` feature is enabled)
+    /// Additionally, enabling certain features also causes all files in the following directories (relative to the input directory) to be ignored (including `.hat` files):
+    /// - `md/` (if the `markdown` feature is enabled)
+    /// - `tmpl/` (if the `templates` feature is enabled)
+    /// - `vars/` (if the `variables` feature is enabled)
     fn default() -> Self
     {
         let mut config =  Config
@@ -88,30 +88,30 @@ impl Default for Config
         };
 
         // Copy all files in the input directory
-        config.set_file_rule("in/**/*", FileRule::Copy);
+        config.set_file_rule("**/*", FileRule::Copy);
 
         // Transpile all .hat files in the input directory
-        config.set_file_rule("in/**/*.hat", FileRule::Transpile);
+        config.set_file_rule("**/*.hat", FileRule::Transpile);
 
         #[cfg(feature = "markdown")]
         {
             config.env.set(builtin::MARKDOWN_DIR_VAR, "md");
             config.env.set("content", builtin::content);
-            config.set_file_rule("in/md/*", FileRule::Ignore);
+            config.set_file_rule("md/*", FileRule::Ignore);
         }
 
         #[cfg(feature = "templates")]
         {
             config.env.set(builtin::TEMPLATES_DIR_VAR, "tmpl");
             config.env.set("include", builtin::include);
-            config.set_file_rule("in/tmpl/*", FileRule::Ignore);
+            config.set_file_rule("tmpl/*", FileRule::Ignore);
         }
 
         #[cfg(feature = "variables")]
         {
             config.env.set(builtin::VARIABLES_DIR_VAR, "vars");
             config.env.set("load", builtin::load);
-            config.set_file_rule("in/vars/*", FileRule::Ignore);
+            config.set_file_rule("vars/*", FileRule::Ignore);
         }
 
         config
