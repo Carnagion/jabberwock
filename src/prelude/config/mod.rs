@@ -4,6 +4,7 @@ use glob::Pattern;
 
 use hatter::Env;
 
+#[cfg(any(feature = "markdown", feature = "templates", feature = "variables"))]
 use crate::builtin;
 
 /// Specifies what to do with a file that is matched by a pattern.
@@ -100,25 +101,32 @@ impl Default for Config
             file_rules: vec![],
         };
 
-        config.env.set(builtin::MARKDOWN_DIR_VAR, "md");
-        config.env.set("content", builtin::content);
-
-        config.env.set(builtin::TEMPLATES_DIR_VAR, "tmpl");
-        config.env.set("include", builtin::include);
-
-        config.env.set(builtin::VARIABLES_DIR_VAR, "vars");
-        config.env.set("load", builtin::load);
-
         // Copy all files in the input directory
         config.set_file_rule(Pattern::new("in/**/*").unwrap_or_default(), FileRule::Copy);
 
         // Transpile all .hat files in the input directory
         config.set_file_rule(Pattern::new("in/**/*.hat").unwrap(), FileRule::Transpile);
 
-        // Ignore all files in the markdown, templates, and variables directories (including .hat files)
-        config.set_file_rule(Pattern::new("in/md/*").unwrap(), FileRule::Ignore);
-        config.set_file_rule(Pattern::new("in/tmpl/*").unwrap(), FileRule::Ignore);
-        config.set_file_rule(Pattern::new("in/vars/*").unwrap(), FileRule::Ignore);
+        #[cfg(feature = "markdown")]
+        {
+            config.env.set(builtin::MARKDOWN_DIR_VAR, "md");
+            config.env.set("content", builtin::content);
+            config.set_file_rule(Pattern::new("in/md/*").unwrap(), FileRule::Ignore);
+        }
+
+        #[cfg(feature = "templates")]
+        {
+            config.env.set(builtin::TEMPLATES_DIR_VAR, "tmpl");
+            config.env.set("include", builtin::include);
+            config.set_file_rule(Pattern::new("in/tmpl/*").unwrap(), FileRule::Ignore);
+        }
+
+        #[cfg(feature = "variables")]
+        {
+            config.env.set(builtin::VARIABLES_DIR_VAR, "vars");
+            config.env.set("load", builtin::load);
+            config.set_file_rule(Pattern::new("in/vars/*").unwrap(), FileRule::Ignore);
+        }
 
         config
     }

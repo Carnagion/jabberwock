@@ -6,5 +6,12 @@ edition = "2021"
 [dependencies]
 glob = "0.3.0"
 hatter = "0.1.4"
-markdown = "0.3.0"
-toml = "0.5.9"
+markdown = { version = "0.3.0", optional = true }
+toml = { version = "0.5.9", optional = true }
+
+[features]
+default = ["builtin"]
+markdown = ["dep:markdown"]
+templates = []
+variables = ["dep:toml"]
+builtin = ["markdown", "templates", "variables"]
