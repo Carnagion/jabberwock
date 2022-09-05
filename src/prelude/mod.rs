@@ -17,8 +17,46 @@ pub const INPUT_DIR_VAR: &str = "input";
 /// The environment variable that stores the path of the output directory.
 pub const OUTPUT_DIR_VAR: &str = "output";
 
-/// Builds a static website by transpiling input `.hat` files to output `.html` files as specified by a [Config].
-pub fn build(config: &mut Config) -> Result<()>
+/// Builds a static website by transpiling input Hatter files to output HTML files using the default [Config].
+///
+/// This is the same as `raven::build_with(&mut Config::default())`.
+///
+/// # Errors
+///
+/// See [build_with()].
+///
+/// # Examples
+/// ```rust
+/// use raven;
+///
+/// let result = raven::build();
+/// println!("{:?}", result);
+/// ```
+pub fn build() -> Result<()>
+{
+    build_with(&mut Config::default())
+}
+
+/// Builds a static website by transpiling input Hatter files to output files as specified by a [Config].
+///
+/// # Errors
+///
+/// Returns an error in the following situations, but is not limited to these:
+/// - A file or directory could not be accessed in the input directory
+/// - A file or directory could not be created in the output directory
+/// - Hatter was unable to transpile an input file's contents
+///
+/// # Examples
+/// ```rust
+/// use raven;
+/// use raven::Config;
+///
+/// let mut config = Config::default();
+/// let result = raven::build_with(&mut config);
+///
+/// println!("{:?}", result);
+/// ```
+pub fn build_with(config: &mut Config) -> Result<()>
 {
     // Empty output directory
     fs::remove_dir_all(&config.output_dir)?;
