@@ -22,8 +22,10 @@ pub const VARIABLES_DIR_VAR: &str = "variables";
 /// Only available if the `variables` feature is enabled.
 pub fn load(args: Args) -> Result<Value>
 {
-    fs::read_to_string(Path::new(macros::require_env_string!(crate::INPUT_DIR_VAR, args.env)?.to_str())
-        .join(macros::require_env_string!(VARIABLES_DIR_VAR, args.env)?.to_str())
+    let in_dir_val = macros::require_env_string!(crate::INPUT_DIR_VAR, args.env)?;
+    let vars_dir_val = macros::require_env_string!(VARIABLES_DIR_VAR, args.env)?;
+    fs::read_to_string(Path::new(in_dir_val.to_str())
+        .join(vars_dir_val.to_str())
         .join(args.need_string(0)?)
         .with_extension("toml"))?
         .parse::<Toml>()
