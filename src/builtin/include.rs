@@ -22,6 +22,10 @@ pub fn include(args: Args) -> Result<Value>
         .join(args.need_string(0)?)
         .with_extension("hat"))?;
     args.env.push_scope();
+    if let Some(params) = args.get(1)
+    {
+        args.env.set("args", params);
+    }
     let html = args.env.render(&hat);
     args.env.pop_scope();
     html.map(|rendered| Value::String(rendered.into()))
