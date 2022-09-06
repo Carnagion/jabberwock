@@ -3,7 +3,7 @@ use hatter::Env;
 #[cfg(any(feature = "markdown", feature = "templates", feature = "variables"))]
 use crate::builtin;
 
-/// Specifies what to do with a file that is matched by a [Pattern].
+/// Specifies what to do with a file that is matched by a glob pattern.
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 pub enum FileRule
 {
