@@ -24,7 +24,7 @@ pub fn load(args: Args) -> Result<Value>
 {
     let in_dir_val = macros::require_env_string!(crate::INPUT_DIR_VAR, args.env)?;
     let vars_dir_val = macros::require_env_string!(VARIABLES_DIR_VAR, args.env)?;
-    fs::read_to_string(Path::new(in_dir_val.to_str())
+    Ok(Value::Map(Map::new(fs::read_to_string(Path::new(in_dir_val.to_str())
         .join(vars_dir_val.to_str())
         .join(args.need_string(0)?)
         .with_extension("toml"))?
@@ -33,8 +33,11 @@ pub fn load(args: Args) -> Result<Value>
         .as_table()
         .ok_or_else(|| macros::hatter_error!(RuntimeError, "Expected TOML table at top level"))?
         .iter()
-        .for_each(|(key, val)| args.env.set(key, toml_to_value(val)));
-    Ok(Value::None)
+        .fold(OMap::new(), |mut map, (key, val)|
+        {
+            map.insert(key, toml_to_value(val));
+            map
+        }))))
 }
 
 fn toml_to_value(toml: &Toml) -> Value
