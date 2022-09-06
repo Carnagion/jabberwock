@@ -17,7 +17,7 @@ use crate::utils::macros;
 /// Only available if the `variables` feature is enabled.
 pub const VARIABLES_DIR_VAR: &str = "variables";
 
-/// Loads variables defined in a specified `.toml` file into the current Hatter environment.
+/// Returns a specified TOML file's contents transpiled into a Hatter [Value].
 ///
 /// Only available if the `variables` feature is enabled.
 pub fn load(args: Args) -> Result<Value>
