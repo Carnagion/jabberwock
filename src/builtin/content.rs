@@ -13,7 +13,7 @@ use crate::utils::macros;
 /// Only available if the `markdown` feature is enabled.
 pub const MARKDOWN_DIR_VAR: &str = "markdown";
 
-/// Transpiles a specified `.md` file and includes its HTML output into the current `.hat` file.
+/// Returns a specified Markdown file's contents transpiled into HTML.
 ///
 /// Only available if the `markdown` feature is enabled.
 pub fn content(args: Args) -> Result<Value>

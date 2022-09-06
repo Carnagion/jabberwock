@@ -12,7 +12,7 @@ use crate::utils::macros;
 /// Only available if the `templates` feature is enabled.
 pub const TEMPLATES_DIR_VAR: &str = "templates";
 
-/// Transpiles a specified `.hat` file and includes its HTML output into the current `.hat` file.
+/// Returns a specified Hatter file's contents transpiled into HTML, along with any extra arguments.
 ///
 /// Only available if the `templates` feature is enabled.
 pub fn include(args: Args) -> Result<Value>
