@@ -35,7 +35,7 @@ pub fn load(args: Args) -> Result<Value>
                 .parse::<Toml>()
                 .map_err(|error| macros::hatter_error!(RuntimeError, format!("Invalid TOML: {error}")))?
                 .as_table()
-                .ok_or_else(|| macros::hatter_error!(RuntimeError, "Invalid TOML"))?
+                .ok_or_else(|| macros::hatter_error!(RuntimeError, "Expected TOML table at top level"))?
                 .iter()
                 .for_each(|(key, val)| args.env.set(key, toml_to_value(val)));
             Ok(Value::None)
