@@ -58,6 +58,16 @@ pub fn build() -> Result<()>
 /// ```
 pub fn build_with(config: &mut Config) -> Result<()>
 {
+    config.env.push_scope();
+    config.env.set(INPUT_DIR_VAR, &config.input_dir);
+    config.env.set(OUTPUT_DIR_VAR, &config.output_dir);
+    let result = generate_static_site(config);
+    config.env.pop_scope();
+    result
+}
+
+fn generate_static_site(config: &mut Config) -> Result<()>
+{
     let in_dir_path = Path::new(&config.input_dir);
     let out_dir_path = Path::new(&config.output_dir);
 
@@ -68,8 +78,8 @@ pub fn build_with(config: &mut Config) -> Result<()>
     for (pattern, rule) in config.file_rules()
     {
         let paths = glob::glob(in_dir_path.join(pattern)
-                .to_str()
-                .ok_or_else(|| macros::hatter_error!(RuntimeError, "Input directory path or glob pattern contains invalid UTF-8 characters"))?)
+            .to_str()
+            .ok_or_else(|| macros::hatter_error!(RuntimeError, "Input directory path or glob pattern contains invalid UTF-8 characters"))?)
             .map_err(|error| macros::hatter_error!(RuntimeError, format!("Invalid glob pattern: {error}")))?;
         for result in paths
         {
@@ -78,8 +88,8 @@ pub fn build_with(config: &mut Config) -> Result<()>
     }
 
     let results = glob::glob(in_dir_path.join("**/*")
-            .to_str()
-            .ok_or_else(|| macros::hatter_error!(RuntimeError, "Input directory path or glob pattern contains invalid UTF-8 characters"))?)
+        .to_str()
+        .ok_or_else(|| macros::hatter_error!(RuntimeError, "Input directory path or glob pattern contains invalid UTF-8 characters"))?)
         .map_err(|error| macros::hatter_error!(RuntimeError, format!("Invalid glob pattern: {error}")))?;
     for result in results
     {
@@ -95,17 +105,17 @@ pub fn build_with(config: &mut Config) -> Result<()>
         {
             FileRule::Ignore => continue,
             FileRule::Copy =>
-            {
-                fs::create_dir_all(out_path.parent().ok_or_else(|| macros::hatter_error!(RuntimeError, format!("Error creating directory: {}", in_path.display())))?)?;
-                fs::copy(in_path, out_path)?;
-            },
+                {
+                    fs::create_dir_all(out_path.parent().ok_or_else(|| macros::hatter_error!(RuntimeError, format!("Error creating directory: {}", in_path.display())))?)?;
+                    fs::copy(in_path, out_path)?;
+                },
             FileRule::Transpile =>
-            {
-                let hat = fs::read_to_string(&in_path)?;
-                let html = config.env.render(&hat)?;
-                fs::create_dir_all(out_path.parent().ok_or_else(|| macros::hatter_error!(RuntimeError, format!("Error creating directory: {}", in_path.display())))?)?;
-                fs::write(out_path.with_extension("html"), html)?;
-            },
+                {
+                    let hat = fs::read_to_string(&in_path)?;
+                    let html = config.env.render(&hat)?;
+                    fs::create_dir_all(out_path.parent().ok_or_else(|| macros::hatter_error!(RuntimeError, format!("Error creating directory: {}", in_path.display())))?)?;
+                    fs::write(out_path.with_extension("html"), html)?;
+                },
         }
     }
 
