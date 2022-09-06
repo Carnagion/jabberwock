@@ -19,7 +19,7 @@ pub const OUTPUT_DIR_VAR: &str = "output";
 
 /// Builds a static website by transpiling input Hatter files to output HTML files using the default [Config].
 ///
-/// This is the same as `raven::build_with(&mut Config::default())`.
+/// This is the same as `jabberwock::build_with(&mut Config::default())`.
 ///
 /// # Errors
 ///
@@ -27,9 +27,9 @@ pub const OUTPUT_DIR_VAR: &str = "output";
 ///
 /// # Examples
 /// ```rust
-/// use raven;
+/// use jabberwock;
 ///
-/// let result = raven::build();
+/// let result = jabberwock::build();
 /// println!("{:?}", result);
 /// ```
 pub fn build() -> Result<()>
@@ -48,11 +48,11 @@ pub fn build() -> Result<()>
 ///
 /// # Examples
 /// ```rust
-/// use raven;
-/// use raven::Config;
+/// use jabberwock;
+/// use jabberwock::Config;
 ///
 /// let mut config = Config::default();
-/// let result = raven::build_with(&mut config);
+/// let result = jabberwock::build_with(&mut config);
 ///
 /// println!("{:?}", result);
 /// ```
