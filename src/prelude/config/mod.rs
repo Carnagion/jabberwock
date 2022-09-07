@@ -97,21 +97,21 @@ impl Default for Config
         {
             config.env.set(builtin::MARKDOWN_DIR_VAR, "md");
             config.env.set("content", builtin::content);
-            config.set_file_rule("md/*", FileRule::Ignore);
+            config.set_file_rule("md/**/*", FileRule::Ignore);
         }
 
         #[cfg(feature = "templates")]
         {
             config.env.set(builtin::TEMPLATES_DIR_VAR, "tmpl");
             config.env.set("include", builtin::include);
-            config.set_file_rule("tmpl/*", FileRule::Ignore);
+            config.set_file_rule("tmpl/**/*", FileRule::Ignore);
         }
 
         #[cfg(feature = "variables")]
         {
             config.env.set(builtin::VARIABLES_DIR_VAR, "vars");
             config.env.set("load", builtin::load);
-            config.set_file_rule("vars/*", FileRule::Ignore);
+            config.set_file_rule("vars/**/*", FileRule::Ignore);
         }
 
         config
