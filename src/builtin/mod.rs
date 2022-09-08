@@ -1,6 +1,6 @@
-#[cfg(feature = "transpile")]
+#[cfg(feature = "hatter")]
 mod transpile;
-#[cfg(feature = "transpile")]
+#[cfg(feature = "hatter")]
 pub use transpile::*;
 
 #[cfg(feature = "markdown")]
