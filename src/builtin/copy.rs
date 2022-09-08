@@ -45,9 +45,9 @@ impl Operation for AssetCopier {
                     .map(|result| result.map_or_else(|error| Err(error.to_string()), Bytes::read))
                     .collect::<Result<Vec<Bytes>, _>>()?;
                 for mut bytes in data {
-                    bytes.path = to.join(bytes.path
+                    bytes.path = generator.source.join(to.join(bytes.path
                         .strip_prefix(&from)
-                        .map_err(|error| error.to_string())?);
+                        .map_err(|error| error.to_string())?));
                     generator.data.push(bytes);
                 }
             }
