@@ -22,7 +22,7 @@ impl Bytes {
         Ok(Bytes {
             path: path_ref.into(),
             raw: fs::read(path_ref)
-                .map_err(|error| error.to_string())?,
+                .map_err(|error| format!("Error reading data at \"{}\": {}", path_ref.display(), error))?,
         })
     }
 }
@@ -46,10 +46,10 @@ impl Generator {
                         .join("**")
                         .join("*")
                         .to_str()
-                        .ok_or_else(|| String::from(""))?)
-                    .map_err(|error| error.to_string())?
+                        .ok_or_else(|| format!("Error converting glob pattern \"{}/**/*\" to string", path_ref.display()))?)
+                    .map_err(|error| format!("Error expanding glob pattern \"{}/**/*\": {}",path_ref.display() , error))?
                     .filter(|result| result.as_ref().map_or(false, |entry| entry.is_file()))
-                    .map(|result| result.map_or_else(|error| Err(error.to_string()), Bytes::read))
+                    .map(|result| result.map_or_else(|error| Err(format!("Error accessing file or directory: {}", error)), Bytes::read))
                     .collect::<Result<Vec<_>, _>>()?,
             source: path_ref.into(),
         })
@@ -62,16 +62,16 @@ impl Generator {
 
     pub fn destination(self, path: impl AsRef<Path>) -> Result<(), String> {
         let path_ref = path.as_ref();
-        fs::remove_dir_all(path_ref).map_err(|error| error.to_string())?;
-        fs::create_dir_all(path_ref).map_err(|error| error.to_string())?;
+        fs::remove_dir_all(path_ref).map_err(|error| format!("Error removing directory \"{}\" and its contents: {}", path_ref.display(), error))?;
+        fs::create_dir_all(path_ref).map_err(|error| format!("Error creating directory \"{}\": {}", path_ref.display(), error))?;
         for bytes in self.data {
             let destination = path_ref.join(bytes.path
                 .strip_prefix(&self.source)
-                .map_err(|error| error.to_string())?);
+                .map_err(|error| format!("Error converting source path \"{}\" to destination path: {}", bytes.path.display(), error))?);
             fs::create_dir_all(destination.parent()
-                    .ok_or_else(|| String::from(""))?)
-                .map_err(|error| error.to_string())?;
-            fs::write(destination, bytes.raw).map_err(|error| error.to_string())?;
+                    .ok_or_else(|| format!("Error finding parent of \"{}\"", destination.display()))?)
+                .map_err(|error| format!("Error creating parent of \"{}\": {}", destination.display(), error))?;
+            fs::write(&destination, bytes.raw).map_err(|error| format!("Error writing data to \"{}\": {}", destination.display(), error))?;
         }
         Ok(())
     }

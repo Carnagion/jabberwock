@@ -41,9 +41,9 @@ fn load(args: Args) -> hatter::Result<Value> {
         .join(args.need_string(0)?)
         .with_extension("toml"))?
         .parse::<Toml>()
-        .map_err(|error| macros::error!(RuntimeError, ""))?
+        .map_err(|error| macros::error!(RuntimeError, error.to_string()))?
         .as_table()
-        .ok_or_else(|| macros::error!(RuntimeError, ""))?
+        .ok_or_else(|| macros::error!(RuntimeError, "Expected table at top level of TOML"))?
         .iter()
         .fold(OMap::new(), |mut map, (key, val)|
         {

@@ -39,15 +39,15 @@ impl Operation for AssetCopier {
                         .join("**")
                         .join("*")
                         .to_str()
-                        .ok_or_else(|| String::from(""))?)
-                    .map_err(|error| error.to_string())?
+                        .ok_or_else(|| format!("Error converting glob pattern \"{}/**/*\" to string", from.display()))?)
+                    .map_err(|error| format!("Error expanding glob pattern \"{}/**/*\": {}",from.display() , error))?
                     .filter(|result| result.as_ref().map_or(false, |entry| entry.is_file()))
-                    .map(|result| result.map_or_else(|error| Err(error.to_string()), Bytes::read))
+                    .map(|result| result.map_or_else(|error| Err(format!("Error accessing file or directory: {}", error)), Bytes::read))
                     .collect::<Result<Vec<Bytes>, _>>()?;
                 for mut bytes in data {
                     bytes.path = generator.source.join(to.join(bytes.path
                         .strip_prefix(&from)
-                        .map_err(|error| error.to_string())?));
+                        .map_err(|error| format!("Error converting source path \"{}\" to destination path: {}", bytes.path.display(), error))?));
                     generator.data.push(bytes);
                 }
             }

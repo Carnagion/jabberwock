@@ -35,5 +35,5 @@ fn content(args: Args) -> hatter::Result<Value> {
     markdown::file_to_html(&Path::new(macros::require_env_string!(MARKDOWN_DIR_VAR, args.env)?.to_str())
             .join(args.need_string(0)?)
             .with_extension("md"))
-        .map_or_else(|error| Err(macros::error!(RuntimeError, "")), |markdown| Ok(Value::String(markdown.into())))
+        .map_or_else(|error| Err(macros::error!(RuntimeError, format!("Error parsing Markdown file to HTML: {}", error))), |markdown| Ok(Value::String(markdown.into())))
 }
