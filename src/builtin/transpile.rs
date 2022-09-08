@@ -3,10 +3,12 @@ use std::str;
 use crate::Generator;
 use crate::Operation;
 
+/// An [Operation] that transpiles Hatter files into HTML files.
 pub struct HatterTranspiler {
 }
 
 impl HatterTranspiler {
+    /// Returns a new [HatterTranspiler].
     pub fn new() -> Self {
         Self {
         }

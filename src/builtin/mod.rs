@@ -1,3 +1,7 @@
+//! Contains built-in operations and functions to assist in generating a static site.
+//!
+//! Each feature is enabled by default, but can optionally be disabled.
+
 #[cfg(feature = "hatter")]
 mod transpile;
 #[cfg(feature = "hatter")]

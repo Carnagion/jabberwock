@@ -8,18 +8,21 @@ use crate::Bytes;
 use crate::Generator;
 use crate::Operation;
 
+/// An [Operation] that copies external files to the output directory.
 pub struct AssetCopier {
     paths: HashMap<PathBuf, PathBuf>,
 }
 
 impl AssetCopier {
+    /// Returns a new [AssetCopier].
     pub fn new() -> Self {
         AssetCopier {
             paths: HashMap::new(),
         }
     }
 
-    pub fn include(&mut self, from: impl AsRef<Path>, to: impl AsRef<Path>) -> &mut Self {
+    /// Copies a file or directory from the specified [Path] to the specified [Path] relative to a [Generator]'s output directory.
+    pub fn copy(&mut self, from: impl AsRef<Path>, to: impl AsRef<Path>) -> &mut Self {
         self.paths.insert(from.as_ref().into(), to.as_ref().into());
         self
     }

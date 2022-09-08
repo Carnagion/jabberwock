@@ -9,13 +9,15 @@ use crate::Generator;
 use crate::Operation;
 use crate::macros;
 
-pub const MARKDOWN_DIR_VAR: &str = "markdown";
+const MARKDOWN_DIR_VAR: &str = "markdown";
 
+/// An [Operation] that adds a Hatter function to transpile Markdown to HTML.
 pub struct MarkdownTranspiler {
     source: String,
 }
 
 impl MarkdownTranspiler {
+    /// Returns a new [MarkdownTranspiler] that looks for Markdown files in the directory specified by the [Path].
     pub fn source(path: impl Into<String>) -> Self {
         Self {
             source: path.into(),

@@ -9,13 +9,15 @@ use crate::Generator;
 use crate::Operation;
 use crate::macros;
 
-pub const TEMPLATES_DIR_VAR: &str = "templates";
+const TEMPLATES_DIR_VAR: &str = "templates";
 
+/// An [Operation] that adds a Hatter function to transpile and include the contents of a Hatter file in another Hatter file.
 pub struct TemplateTranspiler {
     source: String,
 }
 
 impl TemplateTranspiler {
+    /// Returns a new [TemplateTranspiler] that looks for Hatter template files in the directory specified by the [Path].
     pub fn source(path: impl Into<String>) -> Self {
         Self {
             source: path.into(),

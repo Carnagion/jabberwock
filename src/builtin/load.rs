@@ -14,13 +14,15 @@ use crate::Generator;
 use crate::Operation;
 use crate::macros;
 
-pub const VARIABLES_DIR_VAR: &str = "variables";
+const VARIABLES_DIR_VAR: &str = "variables";
 
+/// An [Operation] that adds a Hatter function to transpile TOML files into Hatter values.
 pub struct TomlTranspiler {
     source: String,
 }
 
 impl TomlTranspiler {
+    /// Returns a new [TomlTranspiler] that looks for TOML files in the directory specified by the [Path].
     pub fn source(path: impl Into<String>) -> Self {
         Self {
             source: path.into(),
