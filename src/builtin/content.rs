@@ -1,26 +1,39 @@
 use std::path::Path;
 
 use hatter::Args;
-use hatter::Result;
 use hatter::Value;
 
 use markdown;
 
-use crate::utils::macros;
+use crate::Generator;
+use crate::Operation;
+use crate::macros;
 
-/// The environment variable that stores the path of the markdown directory.
-///
-/// Only available if the `markdown` feature is enabled.
 pub const MARKDOWN_DIR_VAR: &str = "markdown";
 
-/// Returns a specified Markdown file's contents transpiled into HTML.
-///
-/// Only available if the `markdown` feature is enabled.
-pub fn content(args: Args) -> Result<Value>
-{
-    markdown::file_to_html(&Path::new(macros::require_env_string!(crate::INPUT_DIR_VAR, args.env)?.to_str())
-            .join(macros::require_env_string!(MARKDOWN_DIR_VAR, args.env)?.to_str())
+pub struct MarkdownTranspiler {
+    source: String,
+}
+
+impl MarkdownTranspiler {
+    pub fn source(path: impl Into<String>) -> Self {
+        Self {
+            source: path.into(),
+        }
+    }
+}
+
+impl Operation for MarkdownTranspiler {
+    fn apply(self, generator: &mut Generator) -> Result<(), String> {
+        generator.env.set(MARKDOWN_DIR_VAR, self.source);
+        generator.env.set("content", content);
+        Ok(())
+    }
+}
+
+fn content(args: Args) -> hatter::Result<Value> {
+    markdown::file_to_html(&Path::new(macros::require_env_string!(MARKDOWN_DIR_VAR, args.env)?.to_str())
             .join(args.need_string(0)?)
             .with_extension("md"))
-        .map_or_else(|error| Err(macros::hatter_error!(RuntimeError, format!("Invalid markdown: {error}"))), |markdown| Ok(Value::String(markdown.into())))
+        .map_or_else(|error| Err(macros::error!(RuntimeError, "")), |markdown| Ok(Value::String(markdown.into())))
 }

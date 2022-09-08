@@ -1,37 +1,49 @@
 use std::fs;
 use std::path::Path;
 
+use hatter;
 use hatter::Args;
 use hatter::OMap;
-use hatter::Result;
 use hatter::Value;
 use hatter::value::List;
 use hatter::value::Map;
 
 use toml::Value as Toml;
 
-use crate::utils::macros;
+use crate::Generator;
+use crate::Operation;
+use crate::macros;
 
-/// The environment variable that stores the path of the variables directory.
-///
-/// Only available if the `variables` feature is enabled.
 pub const VARIABLES_DIR_VAR: &str = "variables";
 
-/// Returns a specified TOML file's contents transpiled into a Hatter [Value].
-///
-/// Only available if the `variables` feature is enabled.
-pub fn load(args: Args) -> Result<Value>
-{
-    let in_dir_val = macros::require_env_string!(crate::INPUT_DIR_VAR, args.env)?;
-    let vars_dir_val = macros::require_env_string!(VARIABLES_DIR_VAR, args.env)?;
-    Ok(Value::Map(Map::new(fs::read_to_string(Path::new(in_dir_val.to_str())
-        .join(vars_dir_val.to_str())
+pub struct TomlTranspiler {
+    source: String,
+}
+
+impl TomlTranspiler {
+    pub fn source(path: impl Into<String>) -> Self {
+        Self {
+            source: path.into(),
+        }
+    }
+}
+
+impl Operation for TomlTranspiler {
+    fn apply(self, generator: &mut Generator) -> Result<(), String> {
+        generator.env.set(VARIABLES_DIR_VAR, self.source);
+        generator.env.set("load", load);
+        Ok(())
+    }
+}
+
+fn load(args: Args) -> hatter::Result<Value> {
+    Ok(Value::Map(Map::new(fs::read_to_string(Path::new(macros::require_env_string!(VARIABLES_DIR_VAR, args.env)?.to_str())
         .join(args.need_string(0)?)
         .with_extension("toml"))?
         .parse::<Toml>()
-        .map_err(|error| macros::hatter_error!(RuntimeError, format!("Invalid TOML: {error}")))?
+        .map_err(|error| macros::error!(RuntimeError, ""))?
         .as_table()
-        .ok_or_else(|| macros::hatter_error!(RuntimeError, "Expected TOML table at top level"))?
+        .ok_or_else(|| macros::error!(RuntimeError, ""))?
         .iter()
         .fold(OMap::new(), |mut map, (key, val)|
         {
@@ -54,10 +66,10 @@ fn toml_to_value(toml: &Toml) -> Value
         Toml::Table(table) => Value::Map(Map::new(table.into_iter()
             .map(|(key, val)| (key, toml_to_value(val)))
             .fold(OMap::new(), |mut map, (key, val)|
-            {
-                map.insert(key, val);
-                map
-            }))),
+                {
+                    map.insert(key, val);
+                    map
+                }))),
         Toml::Datetime(date) => Value::String(date.to_string().into()),
     }
 }

@@ -1,29 +1,42 @@
 use std::fs;
 use std::path::Path;
 
+use hatter;
 use hatter::Args;
-use hatter::Result;
 use hatter::Value;
 
-use crate::utils::macros;
+use crate::Generator;
+use crate::Operation;
+use crate::macros;
 
-/// The environment variable that stores the path of the templates directory.
-///
-/// Only available if the `templates` feature is enabled.
 pub const TEMPLATES_DIR_VAR: &str = "templates";
 
-/// Returns a specified Hatter file's contents transpiled into HTML, along with any extra arguments.
-///
-/// Only available if the `templates` feature is enabled.
-pub fn include(args: Args) -> Result<Value>
-{
-    let hat = fs::read_to_string(Path::new(macros::require_env_string!(crate::INPUT_DIR_VAR, args.env)?.to_str())
-        .join(macros::require_env_string!(TEMPLATES_DIR_VAR, args.env)?.to_str())
+pub struct TemplateTranspiler {
+    source: String,
+}
+
+impl TemplateTranspiler {
+    pub fn source(path: impl Into<String>) -> Self {
+        Self {
+            source: path.into(),
+        }
+    }
+}
+
+impl Operation for TemplateTranspiler {
+    fn apply(self, generator: &mut Generator) -> Result<(), String> {
+        generator.env.set(TEMPLATES_DIR_VAR, self.source);
+        generator.env.set("include", include);
+        Ok(())
+    }
+}
+
+fn include(args: Args) -> hatter::Result<Value> {
+    let hat = fs::read_to_string(Path::new(macros::require_env_string!(TEMPLATES_DIR_VAR, args.env)?.to_str())
         .join(args.need_string(0)?)
         .with_extension("hat"))?;
     args.env.push_scope();
-    if let Some(params) = args.get(1)
-    {
+    if let Some(params) = args.get(1) {
         args.env.set("args", params);
     }
     let html = args.env.render(&hat);

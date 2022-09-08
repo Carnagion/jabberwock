@@ -1,6 +1,7 @@
-//! A collection of useful built-in Hatter functions.
-//!
-//! Only available if any of the `markdown`, `templates`, or `variables` features are enabled.
+#[cfg(feature = "transpile")]
+mod transpile;
+#[cfg(feature = "transpile")]
+pub use transpile::*;
 
 #[cfg(feature = "markdown")]
 mod content;
@@ -12,7 +13,12 @@ mod include;
 #[cfg(feature = "templates")]
 pub use include::*;
 
-#[cfg(feature = "variables")]
+#[cfg(feature = "toml")]
 mod load;
-#[cfg(feature = "variables")]
+#[cfg(feature = "toml")]
 pub use load::*;
+
+#[cfg(feature = "copy")]
+mod copy;
+#[cfg(feature = "copy")]
+pub use copy::*;
