@@ -55,13 +55,13 @@ fn main() {
 
 fn generate() -> Result<(), String> {
     let mut copier = AssetCopier::new();
-    copier.copy("css/", "css/");                        // set up copier to copy all CSS files from "./css" to "out/css"
+    copier.copy("css/", "css/");                        // set up copier to copy all CSS files from "./css" to "./out/css"
     
     let mut generator = Generator::source("in/")?;      // read input files from "./in/"
     generator.apply(copier)?                            // include CSS files in the output
-        .apply(MarkdownTranspiler::source("md/"))?      // add Hatter function to include transpiled Markdown inside Hatter files
-        .apply(TemplateTranspiler::source("tmpl/"))?    // add Hatter function to include transpiled templates inside Hatter files
-        .apply(TomlTranspiler::source("vars/"))?        // add Hatter function to load TOML as variables inside Hatter files
+        .apply(MarkdownTranspiler::source("md/"))?      // add Hatter function to include transpiled Markdown from "./md/" inside Hatter files
+        .apply(TemplateTranspiler::source("tmpl/"))?    // add Hatter function to include transpiled templates from "./tmpl/" inside Hatter files
+        .apply(TomlTranspiler::source("vars/"))?        // add Hatter function to load TOML from "./vars/" as variables inside Hatter files
         .apply(HatterTranspiler::new())?;               // transpile Hatter files to HTML files
     generator.destination("out/")                       // write output files  to "./out/"
 }
