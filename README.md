@@ -1,7 +1,7 @@
 # Jabberwock
 
-**Jabberwock** is a simple static site generator written entirely in Rust.
-It uses [Hatter](https://github.com/xvxx/hatter) as its templating language, and aims to be highly configurable and modular using a system similar to that of [Metalsmith](https://github.com/metalsmith/metalsmith).
+**Jabberwock** is a simple static site generator written entirely in Rust, using [Hatter](https://github.com/xvxx/hatter) as its templating language.
+It aims to be highly configurable and modular using a system similar to that of [Metalsmith](https://github.com/metalsmith/metalsmith), while still being blazing fast and memory-safe.
 
 # Installation
 
