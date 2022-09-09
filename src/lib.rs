@@ -10,7 +10,7 @@ use glob;
 
 use hatter::Env;
 
-#[cfg(any(feature = "copy", feature = "markdown", feature = "templates", feature = "toml", feature = "hatter"))]
+#[cfg(any(feature = "copy", feature = "markdown", feature = "templates", feature = "toml", feature = "transpile"))]
 pub mod builtin;
 
 mod macros;

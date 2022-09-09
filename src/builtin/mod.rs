@@ -2,9 +2,9 @@
 //!
 //! Each feature is enabled by default, but can optionally be disabled.
 
-#[cfg(feature = "hatter")]
+#[cfg(feature = "transpile")]
 mod transpile;
-#[cfg(feature = "hatter")]
+#[cfg(feature = "transpile")]
 pub use transpile::*;
 
 #[cfg(feature = "markdown")]
