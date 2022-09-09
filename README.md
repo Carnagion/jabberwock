@@ -12,7 +12,7 @@ Unlike some of its contemporaries, **Jabberwock** is designed as a library rathe
 jabberwock = "0.1.0"
 ```
 
-The `copy`, `markdown`, `templates`, `toml`, and `hatter` features are enabled by default. These enable the asset copier, Markdown transpiler, Hatter template transpiler, TOML transpiler, and main Hatter transpiler operations respectively.
+The `copy`, `markdown`, `templates`, `toml`, and `transpile` features are enabled by default. These enable the asset copier, Markdown transpiler, Hatter template transpiler, TOML transpiler, and main Hatter transpiler operations respectively.
 If desired, they can be disabled:
 ```toml
 jabberwock = { version = "0.1.0", default-features = false }
