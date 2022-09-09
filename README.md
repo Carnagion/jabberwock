@@ -1,12 +1,7 @@
 # Jabberwock
 
 **Jabberwock** is a simple static site generator written entirely in Rust.
-It uses [Hatter](https://github.com/xvxx/hatter) as its templating language, and aims to be highly configurable and extendable using file pattern-based rules and Hatter's API.
-
-At its very core, **Jabberwock** simply takes Hatter files from an input directory, transpiles them into HTML files, and writes the results to an output directory.
-
-Additionally, a few other useful features such as transpiling markdown, including templates, and loading variables from TOML files are also included.
-Since **Jabberwock** is designed to be as minimal as possible, these features can be disabled if desired.
+It uses [Hatter](https://github.com/xvxx/hatter) as its templating language, and aims to be highly configurable and modular using a system similar to that of [Metalsmith](https://github.com/metalsmith/metalsmith).
 
 # Installation
 
@@ -17,46 +12,62 @@ Unlike some of its contemporaries, **Jabberwock** is designed as a library rathe
 jabberwock = "0.1.0"
 ```
 
-The `markdown`, `templates`, and `variables` features are enabled by default. If desired, these can be disabled:
+The `copy`, `markdown`, `templates`, `toml`, and `hatter` features are enabled by default. These enable the asset copier, Markdown transpiler, Hatter template transpiler, TOML transpiler, and main Hatter transpiler operations respectively.
+If desired, they can be disabled:
 ```toml
 jabberwock = { version = "0.1.0", default-features = false }
 ```
 
 # Basics
 
-HTML files can be generated from Hatter files using the `build()` function:
-```rust
-use jabberwock;
+**Jabberwock** uses a very simple process:
+- Read files from an input directory as bytes and a path
+- Perform one or more operations on the files' contents and paths
+- Write the files' contents to the paths relative to an output directory
 
-fn main()
-{
-    jabberwock::build().unwrap();
+Commonly-used operations for static sites, such as transpiling Markdown, including templates, loading variables from TOML files, and so on are provided by default, but can be removed by disabling the respective features.
+
+For example, the following code reads Hatter files from the input directory, transpiles them to HTML, and writes the results to the output directory:
+```rust
+use jabberwock::Generator;
+use jabberwock::builtin::HatterTranspiler;
+
+fn main() {
+    println!("{:?}", generate());
+}
+
+fn generate() -> Result<(), String> {
+    let mut generator = Generator::source("in/")?;  // read input files from "./in/"
+    generator.apply(HatterTranspiler::new())?;      // transpile Hatter files to HTML files
+    generator.destination("out/")                   // write output files  to "./out/"
 }
 ```
-By default, **Jabberwock** looks for Hatter files inside the input directory, which is `in/` (relative to the project directory), and writes the output to the output directory, which is `out/` (relative to the project directory).
 
-The result of the `build()` function will contain an error if something went wrong during the process, and nothing otherwise.
-
-If desired, **Jabberwock**'s `Config` struct allows using custom configuration settings, including custom input/output directories, extra Hatter functions, and custom file rules:
+The modular system allows chaining even more complex operations together.
+For example, the following code transpiles Hatter files, adds Hatter functions to load variables from TOML, include Hatter files as templates, and include Markdown file contents as HTML, and also copies CSS files to the output:
 ```rust
-use jabberwock;
-use jabberwock::Config;
-use jabberwock::FileRule;
+use jabberwock::Generator;
+use jabberwock::builtin::*;
 
-fn main()
-{
-    let mut config = Config::new(); // or Config::empty() for an empty configuration with no default settings
+fn main() {
+    println!("{:?}", generate());
+}
+
+fn generate() -> Result<(), String> {
+    let mut copier = AssetCopier::new();
+    copier.copy("css/", "css/");                        // set up copier to copy all CSS files from "./css" to "out/css"
     
-    config.output_dir = String::from("site"); // change the output dir to "site/"
-    config.set_file_rule("**/*.jpg", FileRule::Ignore); // ignore any JPEG files in the input directory and its subdirectories
-    config.env.set("year", "2022"); // set variables in the top-level environment
-    // add other custom settings if desired
-
-    jabberwock::build_with(&mut config).unwrap();
+    let mut generator = Generator::source("in/")?;      // read input files from "./in/"
+    generator.apply(copier)?                            // include CSS files in the output
+        .apply(MarkdownTranspiler::source("md/"))?      // add Hatter function to include transpiled Markdown inside Hatter files
+        .apply(TemplateTranspiler::source("tmpl/"))?    // add Hatter function to include transpiled templates inside Hatter files
+        .apply(TomlTranspiler::source("vars/"))?        // add Hatter function to load TOML as variables inside Hatter files
+        .apply(HatterTranspiler::new())?;               // transpile Hatter files to HTML files
+    generator.destination("out/")                       // write output files  to "./out/"
 }
 ```
 
-Further information is available in **Jabberwock**'s [documentation](https://docs.rs/jabberwock/latest/jabberwock) and [wiki](https://github.com/Carnagion/jabberwock/wiki).
+Further information is available in **Jabberwock**'s [documentation](https://docs.rs/jabberwock/latest/jabberwock).
 
 # Licensing
 
